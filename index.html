@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>safe-claude</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #0a0a0a;
+      color: #e5e5e5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .container {
+      max-width: 600px;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 3rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      letter-spacing: -0.02em;
+    }
+
+    .tagline {
+      color: #737373;
+      font-size: 1.125rem;
+      margin-bottom: 3rem;
+    }
+
+    .install-box {
+      background: #171717;
+      border: 1px solid #262626;
+      border-radius: 8px;
+      padding: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 2rem;
+    }
+
+    .install-cmd {
+      flex: 1;
+      font-family: ui-monospace, monospace;
+      font-size: 0.875rem;
+      color: #a3a3a3;
+      overflow-x: auto;
+      white-space: nowrap;
+      text-align: left;
+    }
+
+    .copy-btn {
+      background: #262626;
+      border: none;
+      color: #e5e5e5;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.875rem;
+      transition: background 0.15s;
+      flex-shrink: 0;
+    }
+
+    .copy-btn:hover {
+      background: #404040;
+    }
+
+    .copy-btn.copied {
+      background: #166534;
+    }
+
+    .features {
+      display: flex;
+      gap: 2rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 2rem;
+    }
+
+    .feature {
+      color: #737373;
+      font-size: 0.875rem;
+    }
+
+    .feature::before {
+      content: "";
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      background: #404040;
+      border-radius: 50%;
+      margin-right: 0.5rem;
+      vertical-align: middle;
+    }
+
+    .note {
+      color: #525252;
+      font-size: 0.75rem;
+    }
+
+    a {
+      color: #737373;
+      text-decoration: none;
+    }
+
+    a:hover {
+      color: #e5e5e5;
+    }
+
+    footer {
+      position: fixed;
+      bottom: 1.5rem;
+      color: #404040;
+      font-size: 0.75rem;
+    }
+
+    footer a {
+      color: #525252;
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 1.5rem 1rem;
+      }
+
+      h1 {
+        font-size: 2.25rem;
+      }
+
+      .tagline {
+        font-size: 1rem;
+        margin-bottom: 2rem;
+      }
+
+      .install-box {
+        flex-direction: column;
+        gap: 0.5rem;
+        padding: 0.75rem;
+      }
+
+      .install-cmd {
+        width: 100%;
+        font-size: 0.75rem;
+        padding: 0.5rem;
+        text-align: center;
+      }
+
+      .copy-btn {
+        width: 100%;
+        padding: 0.75rem;
+      }
+
+      .features {
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+
+      footer {
+        position: static;
+        margin-top: 2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>safe-claude</h1>
+    <p class="tagline">Run Claude Code in a sandbox</p>
+
+    <div class="install-box">
+      <code class="install-cmd">curl -fsSL safe-claude.com/install.sh | bash</code>
+      <button class="copy-btn" onclick="copyInstall(this)">Copy</button>
+    </div>
+
+    <div class="features">
+      <span class="feature">Firejail sandbox</span>
+      <span class="feature">Read-only filesystem</span>
+      <span class="feature">Project isolation</span>
+    </div>
+
+    <p class="note">Linux & macOS. Requires node, npm. Linux needs firejail.</p>
+  </div>
+
+  <footer>
+    <a href="https://github.com/sssemil/safe-claude">GitHub</a>
+  </footer>
+
+  <script>
+    if (location.protocol === 'http:' && location.hostname !== 'localhost') {
+      location.replace('https:' + location.href.substring(5));
+    }
+
+    function copyInstall(btn) {
+      const cmd = document.querySelector('.install-cmd').textContent;
+      navigator.clipboard.writeText(cmd).then(() => {
+        btn.textContent = 'Copied';
+        btn.classList.add('copied');
+        setTimeout(() => {
+          btn.textContent = 'Copy';
+          btn.classList.remove('copied');
+        }, 2000);
+      });
+    }
+  </script>
+</body>
+</html>
