@@ -85,8 +85,8 @@ add_rw() {
 }
 
 add_rw "$PROJECT_DIR"
+add_rw "$CLAUDE_JSON"
 
-[ -e "$CLAUDE_JSON" ] && add_rw "$CLAUDE_JSON"
 [ -d "$CLAUDE_DIR" ]  && add_rw "$CLAUDE_DIR"
 [ -d "$HOME/.cargo" ] && add_rw "$HOME/.cargo"
 [ -d "$HOME/.docker" ] && add_rw "$HOME/.docker"
