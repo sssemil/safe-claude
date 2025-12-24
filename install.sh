@@ -88,6 +88,7 @@ add_rw "$PROJECT_DIR"
 
 [ -e "$CLAUDE_JSON" ] && add_rw "$CLAUDE_JSON"
 [ -d "$CLAUDE_DIR" ]  && add_rw "$CLAUDE_DIR"
+[ -d "$HOME/.cargo" ] && add_rw "$HOME/.cargo"
 [ -d "$HOME/.docker" ] && add_rw "$HOME/.docker"
 [ -d "$HOME/.cache" ] && add_rw "$HOME/.cache"
 
@@ -134,6 +135,7 @@ cat > "$PROFILE" <<SBEOF
 (allow file-write* (literal "/dev/null"))
 (allow file-write* (subpath "$PROJECT_DIR"))
 (allow file-write* (subpath "$CLAUDE_DIR"))
+(allow file-write* (subpath "$HOME/.cargo"))
 (allow file-write* (subpath "$HOME/.docker"))
 (allow file-write* (subpath "$HOME/.cache"))
 (allow file-write* (literal "$HOME/.claude.json"))
@@ -144,6 +146,7 @@ SBEOF
 echo "safe-claude: writable paths:"
 echo "  RW  $PROJECT_DIR"
 echo "  RW  $CLAUDE_DIR"
+echo "  RW  $HOME/.cargo"
 echo "  RW  $HOME/.docker"
 echo "  RW  $HOME/.cache"
 
