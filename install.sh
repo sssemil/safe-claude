@@ -91,6 +91,7 @@ add_rw "$CLAUDE_JSON"
 [ -d "$HOME/.cargo" ] && add_rw "$HOME/.cargo"
 [ -d "$HOME/.docker" ] && add_rw "$HOME/.docker"
 [ -d "$HOME/.cache" ] && add_rw "$HOME/.cache"
+[ -d "$HOME/.npm" ] && add_rw "$HOME/.npm"
 
 echo "safe-claude: writable paths:"
 for p in "${RW_PATHS[@]}"; do
@@ -138,6 +139,7 @@ cat > "$PROFILE" <<SBEOF
 (allow file-write* (subpath "$HOME/.cargo"))
 (allow file-write* (subpath "$HOME/.docker"))
 (allow file-write* (subpath "$HOME/.cache"))
+(allow file-write* (subpath "$HOME/.npm"))
 (allow file-write* (literal "$HOME/.claude.json"))
 (allow file-write* (subpath "/private/tmp"))
 (allow file-write* (subpath "/private/var/folders"))
@@ -149,6 +151,7 @@ echo "  RW  $CLAUDE_DIR"
 echo "  RW  $HOME/.cargo"
 echo "  RW  $HOME/.docker"
 echo "  RW  $HOME/.cache"
+echo "  RW  $HOME/.npm"
 
 exec sandbox-exec -f "$PROFILE" "$CLAUDE" --dangerously-skip-permissions
 EOF
