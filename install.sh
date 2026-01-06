@@ -94,6 +94,7 @@ add_rw "$PROJECT_DIR"
 [ -d "$HOME/.docker" ] && add_rw "$HOME/.docker"
 [ -d "$HOME/.cache" ] && add_rw "$HOME/.cache"
 [ -d "$HOME/.npm" ] && add_rw "$HOME/.npm"
+[ -d "$HOME/.gradle" ] && add_rw "$HOME/.gradle"
 
 echo "safe: writable paths:"
 for p in "${RW_PATHS[@]}"; do
@@ -145,6 +146,7 @@ cat > "$PROFILE" <<SBEOF
 (allow file-write* (subpath "$HOME/.docker"))
 (allow file-write* (subpath "$HOME/.cache"))
 (allow file-write* (subpath "$HOME/.npm"))
+(allow file-write* (subpath "$HOME/.gradle"))
 (allow file-write* (subpath "/private/tmp"))
 (allow file-write* (subpath "/private/var/folders"))
 SBEOF
@@ -158,6 +160,7 @@ echo "  RW  $HOME/.cargo"
 echo "  RW  $HOME/.docker"
 echo "  RW  $HOME/.cache"
 echo "  RW  $HOME/.npm"
+echo "  RW  $HOME/.gradle"
 
 exec sandbox-exec -f "$PROFILE" "$@"
 EOF
