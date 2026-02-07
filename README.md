@@ -1,6 +1,6 @@
 # safe-claude
 
-Run [Claude Code](https://docs.anthropic.com/en/docs/claude-code) in a sandbox with a read-only filesystem.
+Run AI coding agents in a sandbox with a read-only filesystem.
 
 ## Install
 
@@ -13,9 +13,12 @@ curl -fsSL safe-claude.com/install.sh | bash
 ```bash
 cd your-project
 safe-claude
+safe-codex
+safe-opencode
 ```
 
-Only the current directory and Claude config files are writable. Everything else is read-only.
+Only the current directory and supported agent config files are writable. Everything else is read-only.
+safe-opencode sets `OPENCODE_PERMISSION` to allow all permissions.
 
 ## Requirements
 
