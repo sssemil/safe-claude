@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-echo "Installing safe-claude, safe-codex, and safe"
+echo "Installing safe-claude, safe-codex, safe-opencode, and safe"
 
 # OS detection
 OS="$(uname -s)"
@@ -18,7 +18,7 @@ mkdir -p "$BIN_DIR"
 export PATH="$BIN_DIR:$PATH"
 
 # check if already installed
-if [ -x "$BIN_DIR/safe-claude" ] || [ -x "$BIN_DIR/safe-codex" ] || [ -x "$BIN_DIR/safe" ]; then
+if [ -x "$BIN_DIR/safe-claude" ] || [ -x "$BIN_DIR/safe-codex" ] || [ -x "$BIN_DIR/safe-opencode" ] || [ -x "$BIN_DIR/safe" ]; then
   echo "safe-* scripts already installed."
   printf "Reinstall? [Y/n] "
   read -r answer
@@ -90,6 +90,10 @@ add_rw "$PROJECT_DIR"
 [ -f "$HOME/.claude.json" ] && add_rw "$HOME/.claude.json"
 [ -d "$HOME/.codex" ] && add_rw "$HOME/.codex"
 [ -d "$HOME/.openai" ] && add_rw "$HOME/.openai"
+[ -d "$HOME/.config/opencode" ] && add_rw "$HOME/.config/opencode"
+[ -d "$HOME/.opencode" ] && add_rw "$HOME/.opencode"
+[ -n "${OPENCODE_CONFIG_DIR:-}" ] && [ -d "$OPENCODE_CONFIG_DIR" ] && add_rw "$OPENCODE_CONFIG_DIR"
+[ -n "${OPENCODE_CONFIG:-}" ] && [ -f "$OPENCODE_CONFIG" ] && add_rw "$OPENCODE_CONFIG"
 [ -d "$HOME/.cargo" ] && add_rw "$HOME/.cargo"
 [ -d "$HOME/.docker" ] && add_rw "$HOME/.docker"
 [ -d "$HOME/.cache" ] && add_rw "$HOME/.cache"
@@ -151,11 +155,29 @@ cat > "$PROFILE" <<SBEOF
 (allow file-write* (subpath "/private/var/folders"))
 SBEOF
 
+if [ -d "$HOME/.config/opencode" ]; then
+  echo "(allow file-write* (subpath \"$HOME/.config/opencode\"))" >> "$PROFILE"
+fi
+if [ -d "$HOME/.opencode" ]; then
+  echo "(allow file-write* (subpath \"$HOME/.opencode\"))" >> "$PROFILE"
+fi
+if [ -n "${OPENCODE_CONFIG:-}" ] && [ -f "$OPENCODE_CONFIG" ]; then
+  echo "(allow file-write* (literal \"$OPENCODE_CONFIG\"))" >> "$PROFILE"
+fi
+if [ -n "${OPENCODE_CONFIG_DIR:-}" ] && [ -d "$OPENCODE_CONFIG_DIR" ]; then
+  echo "(allow file-write* (subpath \"$OPENCODE_CONFIG_DIR\"))" >> "$PROFILE"
+fi
+
 echo "safe: writable paths:"
 echo "  RW  $PROJECT_DIR"
-echo "  RW  $HOME/.claude"
-echo "  RW  $HOME/.codex"
-echo "  RW  $HOME/.openai"
+[ -d "$HOME/.claude" ] && echo "  RW  $HOME/.claude"
+[ -f "$HOME/.claude.json" ] && echo "  RW  $HOME/.claude.json"
+[ -d "$HOME/.codex" ] && echo "  RW  $HOME/.codex"
+[ -d "$HOME/.openai" ] && echo "  RW  $HOME/.openai"
+[ -d "$HOME/.config/opencode" ] && echo "  RW  $HOME/.config/opencode"
+[ -d "$HOME/.opencode" ] && echo "  RW  $HOME/.opencode"
+[ -n "${OPENCODE_CONFIG:-}" ] && [ -f "$OPENCODE_CONFIG" ] && echo "  RW  $OPENCODE_CONFIG"
+[ -n "${OPENCODE_CONFIG_DIR:-}" ] && [ -d "$OPENCODE_CONFIG_DIR" ] && echo "  RW  $OPENCODE_CONFIG_DIR"
 echo "  RW  $HOME/.cargo"
 echo "  RW  $HOME/.docker"
 echo "  RW  $HOME/.cache"
@@ -184,14 +206,27 @@ cat > "$SAFE_CODEX" <<'EOF'
 #!/usr/bin/env bash
 set -euo pipefail
 SAFE="$(dirname "$0")/safe"
-exec "$SAFE" codex --full-auto "$@"
+exec "$SAFE" codex --dangerously-bypass-approvals-and-sandbox "$@"
 EOF
 chmod +x "$SAFE_CODEX"
+
+# install safe-opencode (thin wrapper around safe)
+SAFE_OPENCODE="$BIN_DIR/safe-opencode"
+cat > "$SAFE_OPENCODE" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+SAFE="$(dirname "$0")/safe"
+OPENCODE_PERMISSION='{"*":"allow"}'
+export OPENCODE_PERMISSION
+exec "$SAFE" opencode "$@"
+EOF
+chmod +x "$SAFE_OPENCODE"
 
 echo
 echo "Installed:"
 echo "  safe-claude  -> $SAFE_CLAUDE"
 echo "  safe-codex   -> $SAFE_CODEX"
+echo "  safe-opencode -> $SAFE_OPENCODE"
 echo "  safe         -> $SAFE_CMD"
 echo
 echo "Make sure ~/.local/bin is in your PATH."
@@ -199,5 +234,5 @@ echo
 echo "Usage:"
 echo "  safe-claude              # Run Claude Code in sandbox"
 echo "  safe-codex               # Run Codex CLI in sandbox"
+echo "  safe-opencode            # Run OpenCode in sandbox"
 echo "  safe <command> [args]    # Run any command in sandbox"
-
